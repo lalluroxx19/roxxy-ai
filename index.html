@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROXXY AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080b09;color:#f5f7f5;font-family:Arial,sans-serif;min-height:100vh}
+header{height:75px;border-bottom:1px solid #253522;display:flex;align-items:center;justify-content:space-between;padding:0 6%;background:#0c100d}
+.logo{font-size:25px;font-weight:900;letter-spacing:2px}
+.logo span{color:#a8ff00}
+.status{color:#a8ff00;font-size:12px}
+main{max-width:950px;margin:65px auto;padding:20px}
+.hero{text-align:center;margin-bottom:35px}
+.hero h1{font-size:clamp(36px,7vw,60px);margin-bottom:12px}
+.hero h1 span{color:#a8ff00}
+.hero p{color:#9ca69c;line-height:1.6}
+.panel{background:#101611;border:1px solid #283a27;border-radius:18px;padding:22px}
+.tools{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:20px}
+.tools button{background:#172018;border:1px solid #354b32;color:#dce8d8;padding:11px 14px;border-radius:9px;cursor:pointer}
+.tools button:hover{border-color:#a8ff00;color:#a8ff00}
+#chat{height:310px;overflow-y:auto;padding:12px;margin-bottom:15px}
+.msg{padding:13px 15px;border-radius:12px;margin:10px 0;line-height:1.5;max-width:85%;white-space:pre-wrap}
+.bot{background:#1b261c;border:1px solid #30442d}
+.user{background:#a8ff00;color:#101510;margin-left:auto}
+.inputrow{display:flex;gap:10px}
+input{min-width:0;flex:1;background:#080d09;color:white;border:1px solid #40533d;border-radius:10px;padding:15px;font-size:15px;outline:none}
+input:focus{border-color:#a8ff00}
+.send{background:#a8ff00;color:#101510;border:0;border-radius:10px;padding:0 22px;font-weight:bold;cursor:pointer}
+.note{color:#899589;font-size:12px;margin-top:15px;line-height:1.5}
+footer{text-align:center;color:#718071;padding:30px;font-size:12px}
+@media(max-width:550px){main{margin:30px auto;padding:14px}.panel{padding:12px}.inputrow{gap:6px}.send{padding:0 14px}}
+</style>
+</head>
+<body>
+<header>
+ <div class="logo">ROXXY<span> AI</span></div>
+ <div class="status">● YOUR AI WORKSPACE</div>
+</header>
+<main>
+ <section class="hero">
+  <h1>Meet <span>ROXXY AI</span></h1>
+  <p>Your personal AI workspace for ideas, business and creativity.</p>
+ </section>
+ <section class="panel">
+  <div class="tools">
+   <button onclick="quick('Help me create an Instagram marketing plan.')">Marketing</button>
+   <button onclick="quick('Help me grow my business.')">Business</button>
+   <button onclick="quick('Give me creative product ideas.')">Ideas</button>
+   <button onclick="quick('Write a professional customer reply.')">Customer support</button>
+  </div>
+  <div id="chat" aria-live="polite">
+   <div class="msg bot">Hello! I'm ROXXY AI. 👋
+
+I'm your new AI workspace. What would you like to work on today?</div>
+  </div>
+  <div class="inputrow">
+   <input id="question" placeholder="Ask ROXXY AI anything..." onkeydown="if(event.key==='Enter')send()">
+   <button class="send" onclick="send()">SEND</button>
+  </div>
+  <p class="note">First version: interface prototype. AI responses will be connected securely in the next development step. Don't enter passwords or private information.</p>
+ </section>
+</main>
+<footer>© 2026 ROXXY AI · BUILT BY ROXXY</footer>
+<script>
+function addMessage(text,type){
+ const box=document.getElementById('chat');
+ const div=document.createElement('div');
+ div.className='msg '+type;
+ div.textContent=text;
+ box.appendChild(div);
+ box.scrollTop=box.scrollHeight;
+}
+function quick(text){
+ document.getElementById('question').value=text;
+ send();
+}
+function send(){
+ const input=document.getElementById('question');
+ const text=input.value.trim();
+ if(!text)return;
+ addMessage(text,'user');
+ input.value='';
+ addMessage("I'm ready for this task! My AI engine is not connected yet. We'll connect a real AI model securely in the next step.",'bot');
+}
+</script>
+</body>
+</html>
