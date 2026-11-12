@@ -1,7 +1,9 @@
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed." });
+    return res.status(405).json({
+      error: "Method not allowed."
+    });
   }
 
   try {
@@ -28,10 +30,7 @@ export default async function handler(req, res) {
           ).toISOString(),
           newSessionExpireTime: new Date(
             Date.now() + 60 * 1000
-          ).toISOString(),
-          liveConnectConstraints: {
-            model: "models/gemini-3.8-live"
-          }
+          ).toISOString()
         })
       }
     );
@@ -57,7 +56,7 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error("Voice token error:", error);
+    console.error("ROXXY voice token error:", error);
 
     return res.status(500).json({
       error: "Could not create voice session."
