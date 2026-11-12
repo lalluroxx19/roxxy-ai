@@ -2,10 +2,29 @@
 const MODELS = [
   "gemini-3.8-flash",
   "gemini-3.7-flash",
-  "gemini-3.5-flash"
+  "gemini-3.6-flash",
+  "gemini-3.5-flash-lite"
 ];
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const SYSTEM_PROMPT = `You are ROXXY AI, created by ROXXY.
+
+You are a helpful, intelligent and friendly personal AI assistant.
+
+Help users with:
+- General questions and explanations
+- Website development and coding
+- Business planning and ideas
+- Marketing and social media
+- Customer support
+- Creativity and productivity
+
+Give accurate, clear and useful answers.
+Use headings and lists when helpful.
+Be honest about your limitations.
+Never claim to have performed actions you did not perform.
+Never reveal API keys, passwords or private server information.`;
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -31,61 +50,53 @@ export default async function handler(req, res) {
       });
     }
 
-    let lastError = "All Gemini models are temporarily unavailable.";
+    let lastError = "All AI models are temporarily unavailable.";
 
     for (const model of MODELS) {
-      // Try each model up to two times.
       for (let attempt = 0; attempt < 2; attempt++) {
         try {
-          const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": apiKey
-              },
-              body: JSON.stringify({
-                system_instruction: {
-                  parts: [{
-                    text: `You are ROXXY AI, created by ROXXY.
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 25000);
 
-You are a helpful, intelligent and friendly personal AI assistant.
+          let response;
 
-Help users with:
-- General questions and explanations
-- Website development and coding
-- Business planning and ideas
-- Marketing and social media
-- Customer support
-- Creativity and productivity
-
-Give accurate, clear and useful answers.
-Use headings and lists when helpful.
-Be honest about your limitations.
-Never claim to have performed actions you did not perform.
-Never reveal API keys, passwords or private server information.`
-                  }]
+          try {
+            response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-goog-api-key": apiKey
                 },
-                contents: [{
-                  role: "user",
-                  parts: [{ text: message.trim() }]
-                }]
-              })
-            }
-          );
+                body: JSON.stringify({
+                  system_instruction: {
+                    parts: [{ text: SYSTEM_PROMPT }]
+                  },
+                  contents: [{
+                    role: "user",
+                    parts: [{ text: message.trim() }]
+                  }]
+                }),
+                signal: controller.signal
+              }
+            );
+          } finally {
+            clearTimeout(timeout);
+          }
 
-          const data = await response.json();
+          const data = await response.json().catch(() => ({}));
 
           if (response.ok) {
             const answer = data.candidates?.[0]?.content?.parts
               ?.map(part => part.text || "")
-              .join("");
+              .join("")
+              .trim();
 
             if (answer) {
               return res.status(200).json({
                 reply: answer,
-                model: model
+                model
               });
             }
 
@@ -93,26 +104,40 @@ Never reveal API keys, passwords or private server information.`
             break;
           }
 
-          lastError = data.error?.message || "Gemini request failed.";
+          lastError = data.error?.message || `Gemini returned ${response.status}.`;
 
-          // Retry or use another model for temporary capacity or quota errors.
-          if (response.status === 429 || response.status === 503) {
+          const temporaryError =
+            response.status === 429 ||
+            response.status === 500 ||
+            response.status === 502 ||
+            response.status === 503 ||
+            response.status === 504;
+
+          if (temporaryError) {
             if (attempt === 0) {
-              await sleep(1500);
+              const retryAfter = Number(response.headers.get("retry-after"));
+              const delay = Number.isFinite(retryAfter) && retryAfter > 0
+                ? Math.min(retryAfter * 1000, 10000)
+                : 2000;
+
+              await sleep(delay);
               continue;
             }
+
             break;
           }
 
-          // Don't hide permanent configuration or request errors.
           return res.status(response.status).json({
             error: lastError
           });
 
         } catch (error) {
-          lastError = error.message || "Network error.";
+          lastError = error.name === "AbortError"
+            ? "Gemini request timed out."
+            : error.message || "Network error.";
+
           if (attempt === 0) {
-            await sleep(1000);
+            await sleep(2000);
             continue;
           }
         }
@@ -120,7 +145,7 @@ Never reveal API keys, passwords or private server information.`
     }
 
     return res.status(503).json({
-      error: "All available AI models are busy or unavailable. Please try again shortly.",
+      error: "ROXXY AI is temporarily busy. Please try again in a few seconds.",
       details: lastError
     });
 
