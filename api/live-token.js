@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     }
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1alpha/auth_tokens",
+      "https://generativelanguage.googleapis.com/v1beta/auth_tokens",
       {
         method: "POST",
         headers: {
@@ -30,21 +30,7 @@ export default async function handler(req, res) {
             Date.now() + 60 * 1000
           ).toISOString(),
           liveConnectConstraints: {
-            model: "models/gemini-3.8-live",
-            config: {
-              responseModalities: ["AUDIO"],
-              systemInstruction: {
-                parts: [{
-                  text: `You are ROXXY AI, created by ROXXY.
-You are a friendly, intelligent voice assistant.
-Speak naturally and keep replies conversational.
-Understand and respond in English or Telugu.
-Help with coding, business, marketing, creativity
-and general questions.
-Never reveal API keys or private information.`
-                }]
-              }
-            }
+            model: "models/gemini-3.8-live"
           }
         })
       }
@@ -54,8 +40,15 @@ Never reveal API keys or private information.`
 
     if (!response.ok) {
       console.error("Gemini token error:", data);
+
       return res.status(response.status).json({
         error: data.error?.message || "Token creation failed."
+      });
+    }
+
+    if (!data.name) {
+      return res.status(500).json({
+        error: "Gemini did not return an authentication token."
       });
     }
 
