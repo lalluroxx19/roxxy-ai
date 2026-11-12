@@ -1,116 +1,127 @@
 
+const MODELS = [
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.5-flash"
+];
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== "POST") {
-    return res.status(405).json({
-      error: "Method not allowed"
-    });
+    return res.status(405).json({ error: "Method not allowed." });
   }
 
   try {
     const { message } = req.body || {};
 
-    // Validate message
-    if (!message || typeof message !== "string") {
-      return res.status(400).json({
-        error: "Please enter a message."
-      });
+    if (typeof message !== "string" || !message.trim()) {
+      return res.status(400).json({ error: "Please enter a message." });
     }
 
     if (message.length > 10000) {
-      return res.status(400).json({
-        error: "Message is too long."
-      });
+      return res.status(400).json({ error: "Message is too long." });
     }
 
-    // Read API key securely from Vercel
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({
-        error: "Gemini API key is not configured."
+        error: "Gemini API key is not configured in Vercel."
       });
     }
 
-    // Connect to Gemini
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": apiKey
-        },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [
-              {
-                text: `You are ROXXY AI, a smart and friendly personal AI assistant.
+    let lastError = "All Gemini models are temporarily unavailable.";
 
-Your identity:
-- Your name is ROXXY AI.
-- You were created by ROXXY.
-- You are helpful, intelligent, creative and professional.
-
-Your capabilities:
-- Answer general questions.
-- Help with coding and website development.
-- Help with business planning.
-- Create marketing strategies.
-- Help with social media content.
-- Generate ideas and explanations.
-- Assist with customer support messages.
-
-Rules:
-- Give clear and useful answers.
-- Use simple language when possible.
-- Be honest when you don't know something.
-- Never claim to have performed an action you haven't performed.
-- Do not reveal API keys or private server information.
-- Format answers clearly with headings and lists when useful.`
-              }
-            ]
-          },
-          contents: [
+    for (const model of MODELS) {
+      // Try each model up to two times.
+      for (let attempt = 0; attempt < 2; attempt++) {
+        try {
+          const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
             {
-              role: "user",
-              parts: [
-                {
-                  text: message
-                }
-              ]
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey
+              },
+              body: JSON.stringify({
+                system_instruction: {
+                  parts: [{
+                    text: `You are ROXXY AI, created by ROXXY.
+
+You are a helpful, intelligent and friendly personal AI assistant.
+
+Help users with:
+- General questions and explanations
+- Website development and coding
+- Business planning and ideas
+- Marketing and social media
+- Customer support
+- Creativity and productivity
+
+Give accurate, clear and useful answers.
+Use headings and lists when helpful.
+Be honest about your limitations.
+Never claim to have performed actions you did not perform.
+Never reveal API keys, passwords or private server information.`
+                  }]
+                },
+                contents: [{
+                  role: "user",
+                  parts: [{ text: message.trim() }]
+                }]
+              })
             }
-          ]
-        })
+          );
+
+          const data = await response.json();
+
+          if (response.ok) {
+            const answer = data.candidates?.[0]?.content?.parts
+              ?.map(part => part.text || "")
+              .join("");
+
+            if (answer) {
+              return res.status(200).json({
+                reply: answer,
+                model: model
+              });
+            }
+
+            lastError = "The AI returned an empty response.";
+            break;
+          }
+
+          lastError = data.error?.message || "Gemini request failed.";
+
+          // Retry or use another model for temporary capacity or quota errors.
+          if (response.status === 429 || response.status === 503) {
+            if (attempt === 0) {
+              await sleep(1500);
+              continue;
+            }
+            break;
+          }
+
+          // Don't hide permanent configuration or request errors.
+          return res.status(response.status).json({
+            error: lastError
+          });
+
+        } catch (error) {
+          lastError = error.message || "Network error.";
+          if (attempt === 0) {
+            await sleep(1000);
+            continue;
+          }
+        }
       }
-    );
-
-    const data = await response.json();
-
-    // Handle Gemini errors
-    if (!response.ok) {
-      console.error("Gemini API error:", data.error);
-
-      return res.status(502).json({
-        error:
-          data.error?.message ||
-          "Gemini could not process your request."
-      });
     }
 
-    // Extract AI response
-    const answer = data.candidates?.[0]?.content?.parts
-      ?.map(part => part.text || "")
-      .join("");
-
-    if (!answer) {
-      return res.status(502).json({
-        error: "Gemini returned an empty response."
-      });
-    }
-
-    return res.status(200).json({
-      reply: answer
+    return res.status(503).json({
+      error: "All available AI models are busy or unavailable. Please try again shortly.",
+      details: lastError
     });
 
   } catch (error) {
