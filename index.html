@@ -2,797 +2,732 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROXXY AI — Voice Assistant</title>
-<style>
-:root {
-  --green: #a8ff00;
-  --bg: #070b08;
-  --panel: #101a12;
-  --card: #19271c;
-  --border: #263b2b;
-  --white: #f4f7f3;
-  --muted: #91a092;
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--white);
-  font-family: Arial, sans-serif;
-}
-header {
-  padding: 20px 6%;
-  border-bottom: 1px solid #172319;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.logo { font-size: 25px; font-weight: 900; }
-.logo span { color: var(--green); }
-.online { color: var(--green); font-size: 12px; }
-main {
-  width: min(850px, 94%);
-  margin: 55px auto;
-  text-align: center;
-}
-h1 { font-size: clamp(34px, 6vw, 54px); margin-bottom: 12px; }
-h1 span { color: var(--green); }
-.subtitle { color: var(--muted); margin-bottom: 35px; }
-.panel {
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 22px;
-  text-align: left;
-}
-.tabs { display: flex; gap: 9px; flex-wrap: wrap; margin-bottom: 20px; }
-.tab {
-  border: 1px solid var(--border);
-  background: var(--card);
-  color: white;
-  padding: 11px 16px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.tab.active { background: var(--green); color: #071006; font-weight: bold; }
-.view { display: none; }
-.view.active { display: block; }
-.status {
-  text-align: center;
-  color: var(--muted);
-  padding: 18px 8px;
-  font-size: 14px;
-}
-.voice-orb {
-  width: 145px;
-  height: 145px;
-  border-radius: 50%;
-  margin: 20px auto;
-  background: radial-gradient(circle, #253d20, #101a12 70%);
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 58px;
-  transition: .25s;
-}
-.voice-orb.active {
-  border-color: var(--green);
-  box-shadow: 0 0 35px #a8ff0055;
-  animation: pulse 1.5s infinite;
-}
-@keyframes pulse {
-  50% { box-shadow: 0 0 55px #a8ff0088; }
-}
-.controls { text-align: center; margin: 20px 0; }
-button:disabled { opacity: .5; cursor: not-allowed; }
-.primary {
-  background: var(--green);
-  color: #071006;
-  border: none;
-  padding: 14px 24px;
-  border-radius: 10px;
-  font-weight: 800;
-  cursor: pointer;
-}
-.secondary {
-  background: #1c2a20;
-  color: white;
-  border: 1px solid var(--border);
-  padding: 13px 20px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.transcript {
-  height: 250px;
-  overflow-y: auto;
-  background: #080e09;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px;
-}
-.bubble {
-  padding: 12px 14px;
-  border-radius: 12px;
-  margin: 9px 0;
-  max-width: 88%;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-}
-.ai { background: var(--card); }
-.user {
-  background: var(--green);
-  color: #071006;
-  margin-left: auto;
-}
-.chat-input {
-  display: flex;
-  gap: 9px;
-  margin-top: 14px;
-}
-input {
-  flex: 1;
-  min-width: 0;
-  padding: 14px;
-  background: #080e09;
-  border: 1px solid var(--green);
-  color: white;
-  border-radius: 10px;
-  outline: none;
-}
-.small {
-  font-size: 12px;
-  color: var(--muted);
-  text-align: center;
-  margin-top: 14px;
-  line-height: 1.6;
-}
-footer {
-  text-align: center;
-  color: #68766a;
-  padding: 20px;
-  font-size: 12px;
-}
-@media(max-width:550px) {
-  main { margin: 35px auto; }
-  .panel { padding: 14px; }
-  .chat-input { flex-direction: column; }
-  .chat-input button { width: 100%; }
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ROXXY AI - Your Personal AI</title>
+
+  <style>
+    :root {
+      --green: #a8ff00;
+      --bg: #070b08;
+      --panel: #101a12;
+      --card: #19271c;
+      --border: #263b2b;
+      --white: #f4f7f3;
+      --muted: #91a092;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 22px 6%;
+      border-bottom: 1px solid #172319;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .logo span, .green { color: var(--green); }
+
+    .online {
+      color: var(--green);
+      font-size: 12px;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 65px auto;
+      padding: 0 18px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: clamp(34px, 6vw, 55px);
+      margin-bottom: 12px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 40px;
+    }
+
+    .workspace {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 22px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: white;
+      padding: 13px 19px;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    button.active, button.primary {
+      background: var(--green);
+      color: #080d05;
+      border-color: var(--green);
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .messages {
+      height: 390px;
+      overflow-y: auto;
+      padding: 12px;
+      background: #080e09;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      margin-bottom: 14px;
+    }
+
+    .message {
+      padding: 15px;
+      border-radius: 12px;
+      margin: 10px 0;
+      max-width: 90%;
+      white-space: pre-wrap;
+      line-height: 1.6;
+      overflow-wrap: anywhere;
+    }
+
+    .bot {
+      background: var(--card);
+      margin-right: auto;
+    }
+
+    .user {
+      background: var(--green);
+      color: #101608;
+      margin-left: auto;
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 15px;
+      border: 1px solid var(--green);
+      border-radius: 10px;
+      background: #080e09;
+      color: white;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .voice-area {
+      text-align: center;
+      padding: 24px 10px;
+    }
+
+    .mic {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: grid;
+      place-items: center;
+      font-size: 55px;
+      margin: 10px auto 25px;
+      background: radial-gradient(circle, #243b27, #0c140e);
+    }
+
+    .mic.listening {
+      border-color: var(--green);
+      box-shadow: 0 0 35px #a8ff0044;
+    }
+
+    .voice-controls {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    #voiceStatus {
+      color: var(--muted);
+      min-height: 24px;
+      margin: 15px;
+    }
+
+    .transcript {
+      height: 230px;
+      overflow-y: auto;
+      text-align: left;
+      padding: 16px;
+      background: #080e09;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 20px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.6;
+      margin-top: 18px;
+    }
+
+    footer {
+      text-align: center;
+      color: #718071;
+      padding: 25px;
+      font-size: 12px;
+    }
+
+    @media(max-width:600px) {
+      main { margin-top: 35px; }
+      .workspace { padding: 14px; }
+      .chat-form { flex-direction: column; }
+      .chat-form button { width: 100%; }
+    }
+  </style>
 </head>
 
 <body>
+
 <header>
   <div class="logo">ROXXY <span>AI</span></div>
-  <div class="online" id="siteStatus">● YOUR AI WORKSPACE</div>
+  <div class="online">● YOUR AI WORKSPACE</div>
 </header>
 
 <main>
-  <h1>Meet <span>ROXXY AI</span></h1>
-  <p class="subtitle">Your personal AI assistant. Talk naturally or type your questions.</p>
+  <h1>Meet <span class="green">ROXXY AI</span></h1>
+  <p class="subtitle">
+    Your personal AI assistant. Talk naturally or type your questions.
+  </p>
 
-  <section class="panel">
+  <section class="workspace">
+
     <div class="tabs">
-      <button class="tab active" data-view="voice">🎙 Voice Agent</button>
-      <button class="tab" data-view="chat">💬 Text Chat</button>
+      <button id="voiceTab" class="active" onclick="showView('voice')">
+        🎙 Voice Agent
+      </button>
+      <button id="chatTab" onclick="showView('chat')">
+        💬 Text Chat
+      </button>
     </div>
 
-    <div class="view active" id="voice">
-      <div class="status" id="voiceStatus">Ready when you are. Press Start Voice.</div>
-      <div class="voice-orb" id="voiceOrb">🎙️</div>
+    <!-- VOICE AGENT -->
 
-      <div class="controls">
-        <button class="primary" id="startVoice">START VOICE</button>
-        <button class="secondary" id="stopVoice" disabled>STOP</button>
-      </div>
+    <section id="voiceView" class="view active">
+      <div class="voice-area">
 
-      <div class="transcript" id="voiceTranscript">
-        <div class="bubble ai">
+        <div id="voiceStatus">Ready to connect.</div>
+
+        <div id="micIcon" class="mic">🎙️</div>
+
+        <div class="voice-controls">
+          <button id="startVoice" class="primary" onclick="startVoice()">
+            START VOICE
+          </button>
+
+          <button id="stopVoice" onclick="stopVoice()" disabled>
+            STOP
+          </button>
+        </div>
+
+        <div id="transcript" class="transcript">
           Hello! 👋 I'm ROXXY AI. Press Start Voice and talk to me.
         </div>
+
+        <p class="hint">
+          Allow microphone access when your browser asks.<br>
+          Voice conversations use the Gemini Live API.
+        </p>
       </div>
+    </section>
 
-      <p class="small">
-        Allow microphone access when your browser asks.<br>
-        Voice conversations use the Gemini Live API.
-      </p>
-    </div>
+    <!-- TEXT CHAT -->
 
-    <div class="view" id="chat">
-      <div class="transcript" id="chatTranscript">
-        <div class="bubble ai">
+    <section id="chatView" class="view">
+      <div id="messages" class="messages">
+        <div class="message bot">
           Hello! 👋 I'm ROXXY AI. How can I help you today?
         </div>
       </div>
 
-      <form class="chat-input" id="chatForm">
-        <input id="chatInput" placeholder="Ask ROXXY AI anything..." autocomplete="off">
-        <button class="primary" id="sendButton">SEND</button>
+      <form id="chatForm" class="chat-form">
+        <input id="chatInput" placeholder="Ask ROXXY AI anything..." required>
+        <button id="sendButton" class="primary" type="submit">SEND</button>
       </form>
-    </div>
+    </section>
+
   </section>
 </main>
 
 <footer>© 2026 ROXXY AI · BUILT BY ROXXY</footer>
 
 <script>
-/* --------------------------------
-   ROXXY AI SETTINGS
---------------------------------- */
+  const LIVE_MODEL = "models/gemini-3.8-live";
 
-const LIVE_MODEL = "models/gemini-3.8-live";
+  let socket = null;
+  let microphoneStream = null;
+  let audioContext = null;
+  let processor = null;
+  let source = null;
+  let outputContext = null;
+  let nextPlayTime = 0;
+  let voiceStarting = false;
+  let voiceActive = false;
+  let setupReady = false;
 
-const ROXXY_INSTRUCTIONS = `
-You are ROXXY AI, created by ROXXY.
+  const $ = id => document.getElementById(id);
 
-You are a friendly, intelligent, natural-sounding voice assistant.
-Speak clearly and conversationally. Keep spoken answers concise unless
-the user asks for detail.
-
-You can help with:
-- General questions and explanations
-- Coding and website development
-- Business ideas and planning
-- Marketing and social media
-- Creativity and productivity
-- Customer support
-
-You are the voice assistant for the ROXXY brand.
-Never claim you performed an action you did not perform.
-Never reveal API keys, passwords or private server information.
-`;
-
-/* --------------------------------
-   TAB SWITCHING
---------------------------------- */
-
-document.querySelectorAll(".tab").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
-    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
-
-    button.classList.add("active");
-    document.getElementById(button.dataset.view).classList.add("active");
-  });
-});
-
-/* --------------------------------
-   COMMON UI HELPERS
---------------------------------- */
-
-const voiceStatus = document.getElementById("voiceStatus");
-const voiceOrb = document.getElementById("voiceOrb");
-const voiceTranscript = document.getElementById("voiceTranscript");
-const startButton = document.getElementById("startVoice");
-const stopButton = document.getElementById("stopVoice");
-
-function addBubble(container, text, type) {
-  const bubble = document.createElement("div");
-  bubble.className = "bubble " + type;
-  bubble.textContent = text;
-  container.appendChild(bubble);
-  container.scrollTop = container.scrollHeight;
-  return bubble;
-}
-
-function setVoiceStatus(text) {
-  voiceStatus.textContent = text;
-}
-
-/* --------------------------------
-   LIVE VOICE STATE
---------------------------------- */
-
-let socket = null;
-let audioContext = null;
-let microphoneStream = null;
-let microphoneSource = null;
-let processor = null;
-let isVoiceStarting = false;
-let isVoiceActive = false;
-let setupComplete = false;
-let nextPlayTime = 0;
-let playbackSources = [];
-let currentUserBubble = null;
-let currentAiBubble = null;
-
-/* --------------------------------
-   BASE64 AND AUDIO HELPERS
---------------------------------- */
-
-function arrayBufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let binary = "";
-  const chunkSize = 0x8000;
-
-  for (let i = 0; i < bytes.length; i += chunkSize) {
-    binary += String.fromCharCode(
-      ...bytes.subarray(i, i + chunkSize)
-    );
+  function showView(view) {
+    $("voiceView").classList.toggle("active", view === "voice");
+    $("chatView").classList.toggle("active", view === "chat");
+    $("voiceTab").classList.toggle("active", view === "voice");
+    $("chatTab").classList.toggle("active", view === "chat");
   }
 
-  return btoa(binary);
-}
-
-function base64ToBytes(base64) {
-  const binary = atob(base64);
-  const bytes = new Uint8Array(binary.length);
-
-  for (let i = 0; i < binary.length; i++) {
-    bytes[i] = binary.charCodeAt(i);
+  function setVoiceStatus(text) {
+    $("voiceStatus").textContent = text;
   }
 
-  return bytes;
-}
+  function addTranscript(label, text) {
+    if (!text) return;
 
-/* Resample microphone audio to 16 kHz mono PCM16. */
-function convertToPCM16(input, inputRate, outputRate = 16000) {
-  const ratio = inputRate / outputRate;
-  const outputLength = Math.floor(input.length / ratio);
-  const output = new Int16Array(outputLength);
-
-  for (let i = 0; i < outputLength; i++) {
-    const position = i * ratio;
-    const index = Math.floor(position);
-    const fraction = position - index;
-
-    const first = input[index] || 0;
-    const second = input[Math.min(index + 1, input.length - 1)] || 0;
-    const sample = first + (second - first) * fraction;
-    const clamped = Math.max(-1, Math.min(1, sample));
-
-    output[i] = clamped < 0
-      ? clamped * 32768
-      : clamped * 32767;
+    const box = $("transcript");
+    const line = document.createElement("div");
+    line.textContent = label + ": " + text;
+    line.style.marginBottom = "10px";
+    box.appendChild(line);
+    box.scrollTop = box.scrollHeight;
   }
 
-  return output;
-}
-
-/* --------------------------------
-   SEND MICROPHONE AUDIO
---------------------------------- */
-
-function sendAudioChunk(floatSamples) {
-  if (!socket || socket.readyState !== WebSocket.OPEN || !setupComplete) {
-    return;
+  function setVoiceButtons(starting, active) {
+    $("startVoice").disabled = starting || active;
+    $("stopVoice").disabled = !starting && !active;
   }
 
-  const pcm = convertToPCM16(
-    floatSamples,
-    audioContext.sampleRate,
-    16000
-  );
+  async function startVoice() {
+    if (voiceStarting || voiceActive) return;
 
-  if (!pcm.length) return;
-
-  socket.send(JSON.stringify({
-    realtimeInput: {
-      audio: {
-        data: arrayBufferToBase64(pcm.buffer),
-        mimeType: "audio/pcm;rate=16000"
-      }
-    }
-  }));
-}
-
-/* --------------------------------
-   PLAY GEMINI AUDIO
---------------------------------- */
-
-async function playAudio(base64Audio, mimeType) {
-  if (!audioContext) return;
-
-  const bytes = base64ToBytes(base64Audio);
-
-  const sampleRateMatch = mimeType && mimeType.match(/rate=(\d+)/);
-  const sampleRate = sampleRateMatch
-    ? Number(sampleRateMatch[1])
-    : 24000;
-
-  const pcm = new Int16Array(
-    bytes.buffer,
-    bytes.byteOffset,
-    Math.floor(bytes.byteLength / 2)
-  );
-
-  if (!pcm.length) return;
-
-  const samples = new Float32Array(pcm.length);
-
-  for (let i = 0; i < pcm.length; i++) {
-    samples[i] = pcm[i] / 32768;
-  }
-
-  const audioBuffer = audioContext.createBuffer(
-    1,
-    samples.length,
-    sampleRate
-  );
-
-  audioBuffer.copyToChannel(samples, 0);
-
-  const source = audioContext.createBufferSource();
-  source.buffer = audioBuffer;
-  source.connect(audioContext.destination);
-
-  const startAt = Math.max(
-    audioContext.currentTime + 0.04,
-    nextPlayTime
-  );
-
-  source.start(startAt);
-  nextPlayTime = startAt + audioBuffer.duration;
-
-  playbackSources.push(source);
-
-  source.onended = () => {
-    playbackSources = playbackSources.filter(item => item !== source);
-  };
-}
-
-function stopPlayback() {
-  playbackSources.forEach(source => {
-    try { source.stop(); } catch (e) {}
-  });
-
-  playbackSources = [];
-
-  if (audioContext) {
-    nextPlayTime = audioContext.currentTime;
-  }
-}
-
-/* --------------------------------
-   SERVER MESSAGE HANDLING
---------------------------------- */
-
-async function handleServerMessage(event) {
-  let message;
-
-  try {
-    message = JSON.parse(event.data);
-  } catch (error) {
-    console.error("Invalid Gemini message:", error);
-    return;
-  }
-
-  if (message.setupComplete) {
-    setupComplete = true;
-    setVoiceStatus("Connected! ROXXY AI is listening...");
-    voiceOrb.classList.add("active");
+    voiceStarting = true;
+    setupReady = false;
+    setVoiceButtons(true, false);
+    setVoiceStatus("Setting up your voice session...");
 
     try {
-      await startMicrophone();
-    } catch (error) {
-      console.error(error);
-      setVoiceStatus("Microphone error: " + error.message);
-      stopVoice();
-    }
+      const tokenResponse = await fetch("/api/live-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
 
-    return;
-  }
+      const tokenData = await tokenResponse.json();
 
-  const serverContent = message.serverContent;
-
-  if (!serverContent) return;
-
-  if (serverContent.interrupted) {
-    stopPlayback();
-    setVoiceStatus("Listening...");
-  }
-
-  if (serverContent.inputTranscription?.text) {
-    const text = serverContent.inputTranscription.text;
-
-    if (!currentUserBubble) {
-      currentUserBubble = addBubble(voiceTranscript, "", "user");
-    }
-
-    currentUserBubble.textContent += text;
-    voiceTranscript.scrollTop = voiceTranscript.scrollHeight;
-  }
-
-  if (serverContent.outputTranscription?.text) {
-    const text = serverContent.outputTranscription.text;
-
-    if (!currentAiBubble) {
-      currentAiBubble = addBubble(voiceTranscript, "", "ai");
-    }
-
-    currentAiBubble.textContent += text;
-    voiceTranscript.scrollTop = voiceTranscript.scrollHeight;
-  }
-
-  const parts = serverContent.modelTurn?.parts || [];
-
-  for (const part of parts) {
-    if (part.text) {
-      if (!currentAiBubble) {
-        currentAiBubble = addBubble(voiceTranscript, "", "ai");
+      if (!tokenResponse.ok || !tokenData.token) {
+        throw new Error(tokenData.error || "Could not get voice token.");
       }
 
-      currentAiBubble.textContent += part.text;
-      voiceTranscript.scrollTop = voiceTranscript.scrollHeight;
-    }
+      const wsUrl =
+        "wss://generativelanguage.googleapis.com/ws/" +
+        "google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent" +
+        "?access_token=" + encodeURIComponent(tokenData.token);
 
-    if (part.inlineData?.data) {
-      await playAudio(
-        part.inlineData.data,
-        part.inlineData.mimeType
-      );
-    }
-  }
+      socket = new WebSocket(wsUrl);
 
-  if (serverContent.turnComplete) {
-    currentUserBubble = null;
-    currentAiBubble = null;
-    setVoiceStatus("Listening... Speak whenever you're ready.");
-  }
-}
+      socket.onopen = () => {
+        setVoiceStatus("Connecting to Gemini Live...");
 
-/* --------------------------------
-   MICROPHONE SETUP
---------------------------------- */
+        socket.send(JSON.stringify({
+          setup: {
+            model: LIVE_MODEL,
+            generationConfig: {
+              responseModalities: ["AUDIO"]
+            },
+            systemInstruction: {
+              parts: [{
+                text:
+                  "You are ROXXY AI, created by ROXXY. " +
+                  "You are a friendly, helpful real-time voice assistant. " +
+                  "Help with general questions, coding, business, marketing, " +
+                  "creativity and productivity. Speak naturally and clearly. " +
+                  "Keep spoken answers concise. Be honest about your abilities. " +
+                  "Never reveal secrets or claim to have performed actions " +
+                  "you did not perform. Respond in the language the user speaks."
+              }]
+            },
+            inputAudioTranscription: {},
+            outputAudioTranscription: {}
+          }
+        }));
+      };
 
-async function startMicrophone() {
-  microphoneStream = await navigator.mediaDevices.getUserMedia({
-    audio: {
-      channelCount: 1,
-      echoCancellation: true,
-      noiseSuppression: true,
-      autoGainControl: true
-    }
-  });
+      socket.onmessage = async event => {
+        try {
+          const rawData = event.data instanceof Blob
+            ? await event.data.text()
+            : event.data;
 
-  microphoneSource = audioContext.createMediaStreamSource(
-    microphoneStream
-  );
+          const data = JSON.parse(rawData);
 
-  processor = audioContext.createScriptProcessor(4096, 1, 1);
+          if (data.setupComplete) {
+            setupReady = true;
+            await activateMicrophone();
+            return;
+          }
 
-  processor.onaudioprocess = event => {
-    if (!isVoiceActive || !setupComplete) return;
+          if (data.serverContent?.interrupted) {
+            nextPlayTime = 0;
+          }
 
-    const samples = event.inputBuffer.getChannelData(0);
-    sendAudioChunk(samples);
-  };
+          const content = data.serverContent;
 
-  microphoneSource.connect(processor);
+          if (content?.inputTranscription?.text) {
+            addTranscript("You", content.inputTranscription.text);
+          }
 
-  // A zero-gain connection keeps the processor running without
-  // playing microphone audio through the speakers.
-  const mute = audioContext.createGain();
-  mute.gain.value = 0;
+          if (content?.outputTranscription?.text) {
+            addTranscript("ROXXY AI", content.outputTranscription.text);
+          }
 
-  processor.connect(mute);
-  mute.connect(audioContext.destination);
+          if (content?.modelTurn?.parts) {
+            for (const part of content.modelTurn.parts) {
+              if (part.inlineData?.data &&
+                  part.inlineData.mimeType?.startsWith("audio/pcm")) {
+                await playPcmAudio(part.inlineData.data);
+              }
 
-  isVoiceActive = true;
-  startButton.disabled = true;
-  stopButton.disabled = false;
-  setVoiceStatus("Listening... Talk to ROXXY AI.");
-}
-
-/* --------------------------------
-   START VOICE SESSION
---------------------------------- */
-
-async function startVoice() {
-  if (isVoiceStarting || isVoiceActive) return;
-
-  isVoiceStarting = true;
-  startButton.disabled = true;
-  setVoiceStatus("Connecting to ROXXY AI...");
-
-  try {
-    if (!navigator.mediaDevices?.getUserMedia) {
-      throw new Error("Microphone access requires HTTPS or localhost.");
-    }
-
-    audioContext = new (
-      window.AudioContext || window.webkitAudioContext
-    )();
-
-    await audioContext.resume();
-
-    // Request a short-lived token from our Vercel backend.
-    const tokenResponse = await fetch("/api/live-token", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({})
-    });
-
-    const tokenData = await tokenResponse.json();
-
-    if (!tokenResponse.ok || !tokenData.token) {
-      throw new Error(
-        tokenData.error || "Could not obtain a voice token."
-      );
-    }
-
-    const url =
-      "wss://generativelanguage.googleapis.com/ws/" +
-      "google.ai.generativelanguage.v1beta.GenerativeService." +
-      "BidiGenerateContentConstrained?access_token=" +
-      encodeURIComponent(tokenData.token);
-
-    socket = new WebSocket(url);
-
-    socket.onopen = () => {
-      setVoiceStatus("Setting up your voice session...");
-
-      socket.send(JSON.stringify({
-        setup: {
-          model: LIVE_MODEL,
-          generationConfig: {
-            responseModalities: ["AUDIO"],
-            speechConfig: {
-              voiceConfig: {
-                prebuiltVoiceConfig: {
-                  voiceName: "Aoede"
-                }
+              if (part.text) {
+                addTranscript("ROXXY AI", part.text);
               }
             }
-          },
-          systemInstruction: {
-            parts: [{ text: ROXXY_INSTRUCTIONS }]
-          },
-          inputAudioTranscription: {},
-          outputAudioTranscription: {}
+          }
+
+          if (data.error) {
+            throw new Error(data.error.message || "Gemini voice error.");
+          }
+
+        } catch (error) {
+          console.error("Gemini message error:", error);
+          setVoiceStatus("Message error: " + error.message);
         }
-      }));
-    };
+      };
 
-    socket.onmessage = handleServerMessage;
+      socket.onerror = error => {
+        console.error("Voice WebSocket error:", error);
+        setVoiceStatus("Voice connection error. Check Console.");
+      };
 
-    socket.onerror = () => {
-      setVoiceStatus("Voice connection error. Please try again.");
-    };
-
-    socket.onclose = event => {
-      if (isVoiceActive || isVoiceStarting) {
+      socket.onclose = event => {
+        console.log("Voice socket closed:", event.code, event.reason);
+        cleanupVoice(false);
         setVoiceStatus(
-          "Voice connection closed. Press Start Voice to reconnect."
+          event.reason
+            ? "Disconnected: " + event.reason
+            : "Voice session disconnected."
         );
-      }
+      };
 
-      cleanupVoice();
-    };
-
-  } catch (error) {
-    console.error("ROXXY voice error:", error);
-    setVoiceStatus(error.message || "Could not start voice.");
-    cleanupVoice();
-  } finally {
-    isVoiceStarting = false;
-  }
-}
-
-/* --------------------------------
-   STOP AND CLEAN UP
---------------------------------- */
-
-function cleanupVoice() {
-  isVoiceActive = false;
-  isVoiceStarting = false;
-  setupComplete = false;
-
-  if (processor) {
-    processor.disconnect();
-    processor.onaudioprocess = null;
-    processor = null;
+    } catch (error) {
+      console.error("Voice setup error:", error);
+      setVoiceStatus("Error: " + error.message);
+      cleanupVoice(true);
+    }
   }
 
-  if (microphoneSource) {
-    microphoneSource.disconnect();
-    microphoneSource = null;
-  }
-
-  if (microphoneStream) {
-    microphoneStream.getTracks().forEach(track => track.stop());
-    microphoneStream = null;
-  }
-
-  stopPlayback();
-
-  if (audioContext) {
-    audioContext.close().catch(() => {});
-    audioContext = null;
-  }
-
-  voiceOrb.classList.remove("active");
-  startButton.disabled = false;
-  stopButton.disabled = true;
-}
-
-function stopVoice() {
-  if (socket && socket.readyState === WebSocket.OPEN) {
-    try {
-      socket.send(JSON.stringify({
-        realtimeInput: {
-          audioStreamEnd: true
-        }
-      }));
-    } catch (error) {}
-  }
-
-  if (socket) {
-    const oldSocket = socket;
-    socket = null;
-    oldSocket.close();
-  }
-
-  cleanupVoice();
-  setVoiceStatus("Voice session stopped.");
-}
-
-startButton.addEventListener("click", startVoice);
-stopButton.addEventListener("click", stopVoice);
-
-/* --------------------------------
-   TEXT CHAT
---------------------------------- */
-
-const chatForm = document.getElementById("chatForm");
-const chatInput = document.getElementById("chatInput");
-const chatTranscript = document.getElementById("chatTranscript");
-const sendButton = document.getElementById("sendButton");
-
-chatForm.addEventListener("submit", async event => {
-  event.preventDefault();
-
-  const message = chatInput.value.trim();
-  if (!message) return;
-
-  addBubble(chatTranscript, message, "user");
-  chatInput.value = "";
-  sendButton.disabled = true;
-  sendButton.textContent = "...";
-
-  const loading = addBubble(
-    chatTranscript,
-    "ROXXY AI is thinking...",
-    "ai"
-  );
-
-  try {
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || "AI request failed.");
+  async function activateMicrophone() {
+    if (!setupReady || !socket || socket.readyState !== WebSocket.OPEN) {
+      return;
     }
 
-    loading.textContent = data.reply || "I couldn't generate a reply.";
+    setVoiceStatus("Requesting microphone permission...");
 
-  } catch (error) {
-    loading.textContent = "Error: " + error.message;
-  } finally {
-    sendButton.disabled = false;
-    sendButton.textContent = "SEND";
-    chatTranscript.scrollTop = chatTranscript.scrollHeight;
-    chatInput.focus();
+    microphoneStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: 1,
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
+    });
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    await audioContext.resume();
+
+    outputContext = new (window.AudioContext || window.webkitAudioContext)({
+      sampleRate: 24000
+    });
+    await outputContext.resume();
+
+    source = audioContext.createMediaStreamSource(microphoneStream);
+
+    processor = audioContext.createScriptProcessor(4096, 1, 1);
+
+    processor.onaudioprocess = event => {
+      if (!voiceActive || !socket ||
+          socket.readyState !== WebSocket.OPEN) return;
+
+      const input = event.inputBuffer.getChannelData(0);
+      const pcm = resampleTo16k(input, audioContext.sampleRate);
+      const base64 = floatTo16BitBase64(pcm);
+
+      socket.send(JSON.stringify({
+        realtimeInput: {
+          audio: {
+            data: base64,
+            mimeType: "audio/pcm;rate=16000"
+          }
+        }
+      }));
+    };
+
+    source.connect(processor);
+    processor.connect(audioContext.destination);
+
+    voiceActive = true;
+    voiceStarting = false;
+
+    $("micIcon").classList.add("listening");
+    setVoiceButtons(false, true);
+    setVoiceStatus("🟢 ROXXY AI is listening. Start speaking!");
   }
-});
 
-/* --------------------------------
-   PAGE CLEANUP
---------------------------------- */
+  function resampleTo16k(input, inputRate) {
+    const outputRate = 16000;
 
-window.addEventListener("beforeunload", () => {
-  if (socket) socket.close();
-  cleanupVoice();
-});
+    if (inputRate === outputRate) {
+      return input;
+    }
+
+    const ratio = inputRate / outputRate;
+    const outputLength = Math.floor(input.length / ratio);
+    const output = new Float32Array(outputLength);
+
+    for (let i = 0; i < outputLength; i++) {
+      const position = i * ratio;
+      const left = Math.floor(position);
+      const right = Math.min(left + 1, input.length - 1);
+      const fraction = position - left;
+
+      output[i] =
+        input[left] * (1 - fraction) +
+        input[right] * fraction;
+    }
+
+    return output;
+  }
+
+  function floatTo16BitBase64(floatData) {
+    const buffer = new ArrayBuffer(floatData.length * 2);
+    const view = new DataView(buffer);
+
+    for (let i = 0; i < floatData.length; i++) {
+      const sample = Math.max(-1, Math.min(1, floatData[i]));
+      view.setInt16(
+        i * 2,
+        sample < 0 ? sample * 32768 : sample * 32767,
+        true
+      );
+    }
+
+    const bytes = new Uint8Array(buffer);
+    let binary = "";
+
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+
+    return btoa(binary);
+  }
+
+  async function playPcmAudio(base64) {
+    if (!outputContext) return;
+
+    const binary = atob(base64);
+    const samples = new Int16Array(binary.length / 2);
+
+    for (let i = 0; i < samples.length; i++) {
+      const low = binary.charCodeAt(i * 2);
+      const high = binary.charCodeAt(i * 2 + 1);
+      let value = (high << 8) | low;
+
+      if (value >= 32768) value -= 65536;
+      samples[i] = value;
+    }
+
+    const audioBuffer = outputContext.createBuffer(
+      1,
+      samples.length,
+      24000
+    );
+
+    const channel = audioBuffer.getChannelData(0);
+
+    for (let i = 0; i < samples.length; i++) {
+      channel[i] = samples[i] / 32768;
+    }
+
+    const audioSource = outputContext.createBufferSource();
+    audioSource.buffer = audioBuffer;
+    audioSource.connect(outputContext.destination);
+
+    const now = outputContext.currentTime;
+    if (nextPlayTime < now) nextPlayTime = now;
+
+    audioSource.start(nextPlayTime);
+    nextPlayTime += audioBuffer.duration;
+  }
+
+  function stopVoice() {
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      try {
+        socket.send(JSON.stringify({
+          realtimeInput: { audioStreamEnd: true }
+        }));
+      } catch (error) {
+        console.warn(error);
+      }
+
+      socket.close();
+    }
+
+    cleanupVoice(true);
+    setVoiceStatus("Voice session stopped.");
+  }
+
+  function cleanupVoice(closeSocket) {
+    voiceActive = false;
+    voiceStarting = false;
+    setupReady = false;
+
+    if (processor) {
+      processor.disconnect();
+      processor.onaudioprocess = null;
+      processor = null;
+    }
+
+    if (source) {
+      source.disconnect();
+      source = null;
+    }
+
+    if (microphoneStream) {
+      microphoneStream.getTracks().forEach(track => track.stop());
+      microphoneStream = null;
+    }
+
+    if (audioContext) {
+      audioContext.close().catch(() => {});
+      audioContext = null;
+    }
+
+    if (outputContext) {
+      outputContext.close().catch(() => {});
+      outputContext = null;
+    }
+
+    if (closeSocket && socket) {
+      const oldSocket = socket;
+      socket = null;
+
+      if (oldSocket.readyState === WebSocket.OPEN ||
+          oldSocket.readyState === WebSocket.CONNECTING) {
+        oldSocket.close();
+      }
+    }
+
+    $("micIcon").classList.remove("listening");
+    setVoiceButtons(false, false);
+  }
+
+  // TEXT CHAT
+
+  $("chatForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const input = $("chatInput");
+    const message = input.value.trim();
+
+    if (!message) return;
+
+    addChatMessage("user", message);
+    input.value = "";
+
+    $("sendButton").disabled = true;
+    const loading = addChatMessage("bot", "ROXXY AI is thinking...");
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Chat request failed.");
+      }
+
+      loading.textContent = data.reply || "No response received.";
+
+    } catch (error) {
+      loading.textContent = "Error: " + error.message;
+    } finally {
+      $("sendButton").disabled = false;
+      $("chatInput").focus();
+    }
+  });
+
+  function addChatMessage(type, text) {
+    const box = $("messages");
+    const message = document.createElement("div");
+
+    message.className = "message " + type;
+    message.textContent = text;
+
+    box.appendChild(message);
+    box.scrollTop = box.scrollHeight;
+
+    return message;
+  }
+
+  window.addEventListener("beforeunload", () => {
+    cleanupVoice(true);
+  });
 </script>
+
 </body>
 </html>
